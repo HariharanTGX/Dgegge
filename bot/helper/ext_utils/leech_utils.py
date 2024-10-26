@@ -270,13 +270,12 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         LOGGER.info(f"New Remname : {file_}")
 
     
+    nfile_ = file_
     if prefix:
-        prefix = prefix.replace('\s', '').strip()  # Ensure no space after the prefix
+        nfile_ = prefix + file_
+        #prefix = re_sub(r'<.*?>', '', prefix).replace('\s', ' ')
         if not file_.startswith(prefix):
             file_ = f"{prefix}{file_}"
-        nfile_ = f"{prefix}{file_}"
-    else:
-        nfile_ = file_
 
     if suffix and not isMirror:
         suffix = suffix.replace('\s', ' ')
