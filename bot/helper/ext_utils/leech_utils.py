@@ -271,9 +271,8 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
 
     nfile_ = file_
     if prefix:
-        nfile_ = prefix+file_
-        #nfile_ = prefix.replace('\s', ' ') + file_
-        prefix = re_sub(r'<.*?>', '', prefix)#.replace('\s', ' ')
+        nfile_ = prefix.replace('\s', '') + file_
+        prefix = re_sub(r'<.*?>', '', prefix).replace('\s', ' ')
         if not file_.startswith(prefix):
             file_ = f"{prefix}{file_}"
 
@@ -327,7 +326,6 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
                     cap_mono = cap_mono.replace(args[0], '')
         cap_mono = cap_mono.replace('%%', '|').replace('&%&', '{').replace('$%$', '}')
     return file_, cap_mono
-
 
 async def get_ss(up_path, ss_no):
     thumbs_path, tstamps = await take_ss(up_path, total=min(ss_no, 250), gen_ss=True)
