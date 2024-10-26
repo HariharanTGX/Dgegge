@@ -241,18 +241,18 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
             LOGGER.error(err)
     return True
 
+
 async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     user_dict = user_data.get(user_id, {})
     ftag, ctag = ('m', 'MIRROR') if isMirror else ('l', 'LEECH')
-    prefix = config_dict[f'{ctag}_FILENAME_PREFIX'] if (val:=user_dict.get(f'{ftag}prefix', '')) == '' else val
-    remname = config_dict[f'{ctag}_FILENAME_REMNAME'] if (val:=user_dict.get(f'{ftag}remname', '')) == '' else val
-    suffix = config_dict[f'{ctag}_FILENAME_SUFFIX'] if (val:=user_dict.get(f'{ftag}suffix', '')) == '' else val
-    lcaption = config_dict['LEECH_FILENAME_CAPTION'] if (val:=user_dict.get('lcaption', '')) == '' else val
- 
+    prefix = config_dict[f'{ctag}_FILENAME_PREFIX'] if (val := user_dict.get(f'{ftag}prefix', '')) == '' else val
+    remname = config_dict[f'{ctag}_FILENAME_REMNAME'] if (val := user_dict.get(f'{ftag}remname', '')) == '' else val
+    suffix = config_dict[f'{ctag}_FILENAME_SUFFIX'] if (val := user_dict.get(f'{ftag}suffix', '')) == '' else val
+    lcaption = config_dict['LEECH_FILENAME_CAPTION'] if (val := user_dict.get('lcaption', '')) == '' else val
+
     prefile_ = file_
-    file_ = re_sub(r'www\S+', '', file_)
-    #file_ = re_sub(r'www[.\w-]+', '', file_)
-        
+    file_ = re_sub(r'www[.\w-]+', '', file_)
+
     if remname:
         if not remname.startswith('|'):
             remname = f"|{remname}"
@@ -270,13 +270,12 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         file_ = __newFileName + ospath.splitext(file_)[1]
         LOGGER.info(f"New Remname : {file_}")
 
-    
     nfile_ = file_
     if prefix:
-        nfile_ = prefix.replace('\s', '').replace(' ', '') + file_
-        prefix = re_sub(r'<.*?>', '', prefix).replace('\s', ' ')
-        if not file_.startswith(prefix):
-            file_ = f"{prefix}{file_}"
+        # Clean prefix and attach it directly to the filename without spaces
+        prefix = re_sub(r'<.*?>', '', prefix).replace(' ', '').strip()  # Remove all spaces and HTML tags
+        nfile_ = f"{prefix}{file_}"  # Attach prefix directly to the filename
+        file_ = nfile_
 
     if suffix and not isMirror:
         suffix = suffix.replace('\s', ' ')
@@ -296,8 +295,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         suffix = suffix.replace('\s', ' ')
         file_ = f"{ospath.splitext(file_)[0]}{suffix}{ospath.splitext(file_)[1]}" if '.' in file_ else f"{file_}{suffix}"
 
-
-    cap_mono =  f"<{config_dict['CAP_FONT']}>{nfile_}</{config_dict['CAP_FONT']}>" if config_dict['CAP_FONT'] else nfile_
+    cap_mono = f"<{config_dict['CAP_FONT']}>{nfile_}</{config_dict['CAP_FONT']}>" if config_dict['CAP_FONT'] else nfile_
     if lcaption and dirpath and not isMirror:
         
         def lowerVars(match):
@@ -309,13 +307,13 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         up_path = ospath.join(dirpath, prefile_)
         dur, qual, lang, subs = await get_media_info(up_path, True)
         cap_mono = slit[0].format(
-            filename = nfile_,
-            size = get_readable_file_size(await aiopath.getsize(up_path)),
-            duration = get_readable_time(dur),
-            quality = qual,
-            languages = lang,
-            subtitles = subs,
-            md5_hash = get_md5_hash(up_path)
+            filename=nfile_,
+            size=get_readable_file_size(await aiopath.getsize(up_path)),
+            duration=get_readable_time(dur),
+            quality=qual,
+            languages=lang,
+            subtitles=subs,
+            md5_hash=get_md5_hash(up_path)
         )
         if len(slit) > 1:
             for rep in range(1, len(slit)):
@@ -327,6 +325,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
                 elif len(args) == 1:
                     cap_mono = cap_mono.replace(args[0], '')
         cap_mono = cap_mono.replace('%%', '|').replace('&%&', '{').replace('$%$', '}')
+    
     return file_, cap_mono
 
 async def get_ss(up_path, ss_no):
