@@ -55,6 +55,22 @@
             padding: 0 25px;
         }
 
+        /* Video Player Styles */
+        .video-container {
+            position: relative;
+            display: block;
+            max-width: 100%;
+            padding-top: 56.25%; /* Aspect ratio for a 16:9 video */
+        }
+
+        video {
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+        }
+
         /* Responsive Styles */
         @media only screen and (max-width: 768px) {
             .site-content {
@@ -156,8 +172,8 @@
           <div class="containerbox">
             
               <!-- Video Player -->
-              <div class="container">
-                  <video id="myVideo" controls src="{{ src }}" width="100%" height="auto" poster="https://envs.sh/pih.jpg">
+              <div class="video-container">
+                  <video id="myVideo" controls src="{{ src }}" poster="https://envs.sh/pih.jpg">
                       Your browser does not support the video tag.
                   </video>
               </div>
